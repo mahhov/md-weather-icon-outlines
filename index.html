@@ -21,15 +21,21 @@
 </style>
 
 <div>
+  <h3>outline</h3>
   <div><span>alpha threshold </span><input id="alpha-threshold" type="number"></div>
   <div><span>thickness </span><input id="search-range" type="number"></div>
   <div><span>red </span><input id="outline-red" type="number"></div>
   <div><span>green </span><input id="outline-green" type="number"></div>
   <div><span>blue </span><input id="outline-blue" type="number"></div>
   <button id="random-inputs">random</button>
+  <h3>circle</h3>
+  <div><span>red </span><input id="circle-red" type="number"></div>
+  <div><span>green </span><input id="circle-green" type="number"></div>
+  <div><span>blue </span><input id="circle-blue" type="number"></div>
 </div>
 <div id="img-container"></div>
 <div id="canvas-container"></div>
+<div id="circle-canvas-container"></div>
 
 <script>
   const $ = document.querySelector.bind(document);
@@ -55,6 +61,9 @@
     outlineRed: 255,
     outlineGreen: 255,
     outlineBlue: 255,
+    circleRed: 26,
+    circleGreen: 115,
+    circleBlue: 232,
   };
 
   let inputIds = [
@@ -63,6 +72,9 @@
     'outline-red',
     'outline-green',
     'outline-blue',
+    'circle-red',
+    'circle-green',
+    'circle-blue',
   ];
 
   let inputName = inputId => inputId.replace(/-(\w)/g, (_, a) => a.toUpperCase());
@@ -106,9 +118,17 @@
     return canvas;
   });
 
-  images.forEach((img, i) => img.addEventListener('load', () => drawCanvas(img, canvases[i])))
+  let circleCanvases = dataUrls.map(() => {
+    let canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 64;
+    $('#circle-canvas-container').appendChild(canvas);
+    return canvas;
+  });
 
-  let drawAllCanvas = () => images.forEach((img, i) => drawCanvas(img, canvases[i]));
+  let drawAllCanvas = () => {
+    images.forEach((img, i) => drawCanvas(img, canvases[i]));
+    images.forEach((img, i) => drawCircleCanvas(img, circleCanvases[i]));
+  };
 
   let drawCanvas = (img, canvas) => {
     let context = canvas.getContext('2d');
@@ -166,4 +186,20 @@
 
     context.putImageData(new ImageData(new Uint8ClampedArray(outlinedPixelData), 64, 64), 0, 0);
   };
+
+  let drawCircleCanvas = (img, canvas) => {
+    let context = canvas.getContext('2d');
+    context.clearRect(0, 0, 64, 64);
+
+    context.beginPath();
+    context.arc(32, 32, 32, 0, Math.PI * 2);
+    context.fillStyle = `rgb(${inputs.circleRed}, ${inputs.circleGreen}, ${inputs.circleBlue})`;
+    context.fill();
+
+    context.drawImage(img, 0, 0);
+  };
+
+  Promise.all(images.map(img => new Promise(resolve => img.addEventListener('load', resolve))))
+      .then(drawAllCanvas);
+
 </script>
