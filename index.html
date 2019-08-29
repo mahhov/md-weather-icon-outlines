@@ -215,7 +215,8 @@
 
     let drawCircleCanvas = (img, canvas) => {
         let context = canvas.getContext('2d');
-        context.clearRect(0, 0, 64, 64);
+        context.fillStyle = `rgb(${BACKGROUND_COLOR.r}, ${BACKGROUND_COLOR.g}, ${BACKGROUND_COLOR.b})`;
+        context.fillRect(0, 0, 64, 64);
 
         context.beginPath();
         context.arc(32, 32, 32, 0, Math.PI * 2);
